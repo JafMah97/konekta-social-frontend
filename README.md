@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Konekta — frontend
 
-## Getting Started
+Web client for the [Konekta API](https://github.com/JafMah97/konekta-social-backend) (Fastify, Prisma, PostgreSQL).
+Next.js 16 · React 19 · TanStack Query · Tailwind 4 · Radix · English and Arabic (RTL).
 
-First, run the development server:
+## Features
+
+- Home feed with infinite scroll, a composer (text and photo, with who-can-see-it), likes, saves and inline comments
+- Profiles with follow and unfollow, follow requests for private accounts, and follower/following lists
+- Live notifications over Socket.IO, with an unread badge, toasts and a notifications inbox
+- Every auth flow the API supports: sign-up, email code or link, magic link, forgot/reset password, email change
+- Settings for profile, avatar and cover, privacy, theme, language, password, email and account deletion
+- One-click sign-in to the demo account from the landing page
+
+## How it talks to the API
+
+The browser only calls this app's own origin. `src/app/api/[...path]/route.ts` forwards `/api/*`
+to `BACKEND_URL`, and the Socket.IO long-polling transport goes through the same route.
+
+Why: called cross-site, the API's `httpOnly` session cookie is a third-party cookie, which Safari
+and any browser that blocks third-party cookies silently drop. Proxied, the cookie is first-party
+and gets rewritten to `SameSite=Lax`. The proxy also forwards the client IP, so the API's rate
+limits stay per user and aren't shared by every visitor.
+
+`src/proxy.ts` adds the `/en` or `/ar` prefix (keeping the path and query, so emailed links still
+work) and redirects between signed-in and signed-out pages based on whether the cookie is present.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env    # BACKEND_URL=https://konekta-social-backend.onrender.com or http://localhost:4000
+npm install
+npm run dev             # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run build && npm start` runs the production build. The API runs on a free host that sleeps
+when idle; the app shows a notice while the first request wakes it up.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/app/[lang]/          routes: landing, auth/*, (app)/feed, explore, notifications, saved,
+                         settings, welcome, posts/[id], users/[id] (+ followers, following)
+src/app/api/[...path]/   same-origin proxy to the API
+src/components/          ui primitives, shell, post, people, auth, views
+src/hooks/               TanStack Query hooks with optimistic updates
+src/lib/api/             fetch client, typed endpoints, response types
+src/lib/i18n/            dictionaries (Arabic is type-checked against English)
+```

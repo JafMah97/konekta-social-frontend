@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Konekta palette: warm paper and ink, plus five flat accents. Accents are
+  used as solid fills (with their matching on-* text color) or, for text on
+  paper, as the darker/lighter *-ink variant that keeps AA contrast.
+*/
+:root {
+  --paper: #f5efe4;
+  --surface: #fffcf6;
+  --sunken: #ede5d6;
+  --ink: #1b1712;
+  --ink-soft: #5f574b;
+  --ink-faint: #8c8374;
+  --line: #e2d8c7;
+
+  --tomato: #ff5b37;
+  --cobalt: #3553ff;
+  --sun: #ffc23a;
+  --mint: #1db88e;
+  --plum: #c2459b;
+
+  --on-tomato: #1b1712;
+  --on-cobalt: #ffffff;
+  --on-sun: #1b1712;
+  --on-mint: #1b1712;
+  --on-plum: #ffffff;
+
+  --tomato-ink: #c13a17;
+  --cobalt-ink: #2a43d9;
+  --sun-ink: #8a6100;
+  --mint-ink: #0e7a5c;
+  --plum-ink: #9a2f7a;
+
+  color-scheme: light;
+}
+
+.dark {
+  --paper: #14110d;
+  --surface: #1c1813;
+  --sunken: #0f0d0a;
+  --ink: #f4eee3;
+  --ink-soft: #b3a999;
+  --ink-faint: #7c7467;
+  --line: #2f2921;
+
+  --tomato: #ff6a48;
+  --cobalt: #6b82ff;
+  --sun: #ffc94d;
+  --mint: #34c99f;
+  --plum: #e05fb6;
+
+  --on-tomato: #14110d;
+  --on-cobalt: #0f0d0a;
+  --on-sun: #14110d;
+  --on-mint: #14110d;
+  --on-plum: #14110d;
+
+  --tomato-ink: #ff8f70;
+  --cobalt-ink: #9aabff;
+  --sun-ink: #ffd36b;
+  --mint-ink: #5fdcb6;
+  --plum-ink: #f28ccf;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+
+  --color-tomato: var(--tomato);
+  --color-cobalt: var(--cobalt);
+  --color-sun: var(--sun);
+  --color-mint: var(--mint);
+  --color-plum: var(--plum);
+  --color-on-tomato: var(--on-tomato);
+  --color-on-cobalt: var(--on-cobalt);
+  --color-on-sun: var(--on-sun);
+  --color-on-mint: var(--on-mint);
+  --color-on-plum: var(--on-plum);
+  --color-tomato-ink: var(--tomato-ink);
+  --color-cobalt-ink: var(--cobalt-ink);
+  --color-sun-ink: var(--sun-ink);
+  --color-mint-ink: var(--mint-ink);
+  --color-plum-ink: var(--plum-ink);
+
+  --font-sans: var(--font-instrument), var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-amiri), ui-serif, Georgia, serif;
+
+  --radius-card: 1.25rem;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* IBM Plex Arabic sits visibly smaller than the Latin faces at equal size */
+  html[dir="rtl"] {
+    font-size: 106.25%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 60;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Amiri needs air: Arabic headings get looser leading */
+  [dir="rtl"] :is(h1, h2, h3) {
+    letter-spacing: 0;
+    line-height: 1.35;
+  }
+
+  ::selection {
+    background: var(--sun);
+    color: var(--on-sun);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--cobalt);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hand-drawn feeling underline for inline links */
+  .link {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+    transition: text-decoration-color 150ms;
+  }
+  .link:hover {
+    text-decoration-color: var(--tomato);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Heart pop when a post is liked */
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: pop 320ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-rise {
+  animation: rise 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-rise {
+    animation: none;
+  }
+}
