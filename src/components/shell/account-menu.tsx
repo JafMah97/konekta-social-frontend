@@ -1,10 +1,8 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { toast } from "sonner";
 import { PrefsMenuItems } from "@/components/prefs";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
@@ -13,17 +11,13 @@ import type { Me } from "@/lib/api/types";
 import { useHref, useI18n } from "@/lib/i18n/provider";
 
 export function useSignOut() {
-  const router = useRouter();
   const href = useHref();
-  const qc = useQueryClient();
-  const { t } = useI18n();
   return async () => {
     // Even if the API call fails (e.g. session already gone) drop the cookie
     await auth.logout().catch(() => fetch("/api/client-session", { method: "DELETE" }));
-    qc.clear();
-    toast(t.nav.signedOut);
-    router.replace(href("/"));
-    router.refresh();
+    // A full load, not a client navigation: clearing the cache while signed-in
+    // pages are still mounted crashes them, and this also closes the socket
+    window.location.assign(href("/"));
   };
 }
 

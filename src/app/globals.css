@@ -92,8 +92,8 @@
   --color-mint-ink: var(--mint-ink);
   --color-plum-ink: var(--plum-ink);
 
-  --font-sans: var(--font-instrument), var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), var(--font-amiri), ui-serif, Georgia, serif;
+  --font-sans: var(--font-instrument), var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-cairo), ui-serif, Georgia, serif;
 
   --radius-card: 1.25rem;
 }
@@ -101,11 +101,6 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
-  }
-
-  /* IBM Plex Arabic sits visibly smaller than the Latin faces at equal size */
-  html[dir="rtl"] {
-    font-size: 106.25%;
   }
 
   body {
@@ -127,7 +122,7 @@
     text-wrap: balance;
   }
 
-  /* Amiri needs air: Arabic headings get looser leading */
+  /* Arabic headings need looser leading and no negative tracking */
   [dir="rtl"] :is(h1, h2, h3) {
     letter-spacing: 0;
     line-height: 1.35;

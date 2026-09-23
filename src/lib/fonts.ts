@@ -1,4 +1,4 @@
-import { Amiri, Fraunces, IBM_Plex_Sans_Arabic, Instrument_Sans } from "next/font/google";
+import { Cairo, Fraunces, Instrument_Sans } from "next/font/google";
 
 // Latin glyphs come from the first family in each stack, Arabic ones fall
 // through to the second, so mixed-language text renders without switching.
@@ -10,24 +10,18 @@ export const display = Fraunces({
   display: "swap",
 });
 
-export const displayArabic = Amiri({
-  subsets: ["arabic"],
-  weight: ["400", "700"],
-  variable: "--font-amiri",
-  display: "swap",
-});
-
 export const sans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument",
   display: "swap",
 });
 
-export const sansArabic = IBM_Plex_Sans_Arabic({
+// One Arabic family for body and headings
+export const arabic = Cairo({
   subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plex-arabic",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-cairo",
   display: "swap",
 });
 
-export const fontVariables = [display, displayArabic, sans, sansArabic].map((f) => f.variable).join(" ");
+export const fontVariables = [display, sans, arabic].map((f) => f.variable).join(" ");

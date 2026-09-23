@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -409,8 +408,6 @@ function DangerSection({ me }: { me: Me }) {
   const { t } = useI18n();
   const d = t.settings.danger;
   const href = useHref();
-  const router = useRouter();
-  const qc = useQueryClient();
   const errorMessage = useErrorMessage();
   const [typed, setTyped] = useState("");
   const [open, setOpen] = useState(false);
@@ -420,10 +417,8 @@ function DangerSection({ me }: { me: Me }) {
     setPending(true);
     try {
       await account.deleteAccount();
-      qc.clear();
-      toast(d.deleted);
-      router.replace(href("/"));
-      router.refresh();
+      // Full load for the same reason as sign-out (see account-menu.tsx)
+      window.location.assign(href("/"));
     } catch (err) {
       toast.error(errorMessage(err));
       setPending(false);
