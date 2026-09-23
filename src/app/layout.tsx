@@ -1,11 +1,6 @@
-import { Metadata } from "next";
+import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
-  title: "Knoekta - Konekta social",
-  description:
-  "Make new Connections "
-};
-
-export default function Layout({ children }: { children: React.ReactNode }) {
+// <html> and <body> live in app/[lang]/layout.tsx so they can carry lang/dir.
+export default function RootLayout({ children }: { children: ReactNode }) {
   return children;
 }

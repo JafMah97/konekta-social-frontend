@@ -1,74 +1,41 @@
-import "@/styles/globals.css";
-import type { Metadata } from "next";
-import { enFont, arFont } from "@/lib/fonts";
-import { ThemeProvider } from "@/providers/theme-provider";
-import Navbar from "@/components/layout/navbar/navbar";
-import Footer from "@/components/layout/footer/footer";
-import { TranslationsProvider } from "@/providers/translation-provider";
-import {
-  getDictionary,
-  i18n,
-  Lang,
-} from "@/utils/translation/dictionary-utils";
-import { getDirection } from "@/utils/translation/language-utils";
-import NextTopLoader from "nextjs-toploader";
-import { Toaster } from "sonner";
-import ReactQueryProvider from "@/providers/react-query-provider";
-import { EmojiPickerProvider } from "@/providers/emoji-picker-provider";
+import type { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import "../globals.css";
+import { Providers } from "@/components/providers";
+import { fontVariables } from "@/lib/fonts";
+import { getDictionary } from "@/lib/i18n";
+import { dirOf, isLang, langs } from "@/lib/i18n/config";
 
-export const metadata: Metadata = {
-  title: "Konekta Social",
-  description: "Konekta Social App",
+export function generateStaticParams() {
+  return langs.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { meta } = getDictionary((await params).lang);
+  return {
+    title: { default: meta.title, template: `%s · ${meta.title}` },
+    description: meta.description,
+  };
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5efe4" },
+    { media: "(prefers-color-scheme: dark)", color: "#14110d" },
+  ],
 };
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ lang: string }>;
-}
-
-export async function generateStaticParams() {
-  return i18n.langs.map((lang: Lang) => ({ lang }));
-}
-
-export default async function RootLayout({
-  params,
-  children,
-}: RootLayoutProps) {
-  const { lang } = (await params) as { lang: Lang };
-  const translations = await getDictionary(lang);
-
-  const fontClass = lang == "ar" ? arFont.className : enFont.className;
+export default async function LangLayout({ children, params }: { children: ReactNode; params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  if (!isLang(lang)) notFound();
 
   return (
-    <html lang={lang} dir={getDirection(lang)} suppressHydrationWarning>
-      <body className={`${fontClass}`}>
-        <TranslationsProvider translations={translations}>
-          <ReactQueryProvider>
-            <NextTopLoader color="var(--color-primary)" showSpinner={false} />
-            <ThemeProvider
-              attribute={"class"}
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <EmojiPickerProvider>
-                <Navbar lang={lang} />
-                {children}
-                <Toaster
-                  position="top-center"
-                  toastOptions={{
-                    className: `antialiased ${fontClass}`,
-                    style: {
-                      backgroundColor: "var(--color-background)",
-                      color: "var(--color-foreground",
-                    },
-                  }}
-                />
-                <Footer lang={lang} />
-              </EmojiPickerProvider>
-            </ThemeProvider>
-          </ReactQueryProvider>
-        </TranslationsProvider>
+    <html lang={lang} dir={dirOf(lang)} className={fontVariables} suppressHydrationWarning>
+      <body className="min-h-dvh">
+        <Providers lang={lang} dict={getDictionary(lang)}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

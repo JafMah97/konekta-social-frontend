@@ -1,53 +1,45 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import { useState } from "react";
+import { mediaUrl } from "@/lib/api/client";
+import { cn, initials, swatchFor } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+const SIZES = {
+  xs: "size-7 text-[0.65rem]",
+  sm: "size-9 text-xs",
+  md: "size-11 text-sm",
+  lg: "size-16 text-lg",
+  xl: "size-28 text-3xl sm:size-32",
+};
 
-function Avatar({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
-  return (
-    <AvatarPrimitive.Root
-      data-slot="avatar"
-      className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
-      )}
-      {...props}
-    />
-  )
+const FILLS = {
+  tomato: "bg-tomato text-on-tomato",
+  cobalt: "bg-cobalt text-on-cobalt",
+  sun: "bg-sun text-on-sun",
+  mint: "bg-mint text-on-mint",
+  plum: "bg-plum text-on-plum",
+};
+
+interface AvatarProps {
+  user: { id: string; username: string; fullName?: string | null; profileImage?: string | null };
+  size?: keyof typeof SIZES;
+  className?: string;
 }
 
-function AvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
-  )
-}
+export function Avatar({ user, size = "md", className }: AvatarProps) {
+  const src = mediaUrl(user.profileImage);
+  const [failed, setFailed] = useState(false);
+  const base = cn("relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full", SIZES[size], className);
 
-function AvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+  if (src && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- remote user media, sizes vary
+      <img src={src} alt="" className={cn(base, "bg-sunken object-cover")} onError={() => setFailed(true)} />
+    );
+  }
   return (
-    <AvatarPrimitive.Fallback
-      data-slot="avatar-fallback"
-      className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
-      )}
-      {...props}
-    />
-  )
+    <span aria-hidden className={cn(base, FILLS[swatchFor(user.id)], "font-display font-semibold")}>
+      {initials(user.fullName, user.username)}
+    </span>
+  );
 }
-
-export { Avatar, AvatarImage, AvatarFallback }
